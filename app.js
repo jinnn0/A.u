@@ -2,8 +2,25 @@ import * as THREE from './node_modules/three/build/three.module.js';
 
 const canvas = document.querySelector('canvas');
 
+const colors = [
+  '#4080ff',
+  '#ffe940',
+  '#40ffff',
+  '#fed1ff',
+  '#ee00f2',
+  '#f25100',
+  '#d2d1ff',
+  '#ffa929',
+  '#cfff4a',
+  '#fff200',
+  '#8efabf',
+  '#0026ff',
+  '#ff4f6f'
+];
+
 let renderer, camera, scene;
 let sphere;
+let material;
 
 function init() {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -27,22 +44,17 @@ function init() {
 
   // sphere
   // material
-  function Mat() {
-    const material = new THREE.MeshPhongMaterial({
-      color: new THREE.Color('rgb(35,35,213)'),
-      emissive: new THREE.Color('rgb(64,128,255)'),
-      specular: new THREE.Color('rgb(93,195,255)'),
-      shininess: 1,
-      shading: THREE.FlatShading,
-      wireframe: 1,
-      transparent: 1,
-      opacity: 0.15
-    });
-    return material;
-  }
+  material = new THREE.MeshPhongMaterial({
+    color: new THREE.Color('rgb(35,35,213)'),
+    specular: new THREE.Color('rgb(93,195,255)'),
+    shininess: 1,
+    wireframe: 1,
+    transparent: true,
+    opacity: 0.5
+  });
 
-  const geometry2 = new THREE.SphereGeometry(2, 40, 40, 0, Math.PI * 2, 0, Math.PI);
-  sphere = new THREE.Mesh(geometry2, Mat());
+  const geometry2 = new THREE.SphereGeometry(2, 10, 10, 0, Math.PI * 2, 0, Math.PI);
+  sphere = new THREE.Mesh(geometry2, material);
   scene.add(sphere);
 }
 
@@ -73,4 +85,19 @@ function resizeRendererToDisplaySize() {
   const needResize = canvas.width !== width || canvas.height !== height;
 
   return needResize;
+}
+
+document.addEventListener('keyup', (event) => {
+  if (event.code === 'Space') {
+    const randomNumber = getNumber();
+    console.log(randomNumber, Object.entries(getNumber));
+    material.color = new THREE.Color(colors[randomNumber]);
+  }
+});
+
+/* util functions */
+function getNumber() {
+  return (getNumber.number = Math.floor(Math.random() * 14)) === getNumber.lastNumber
+    ? getNumber()
+    : (getNumber.lastNumber = getNumber.number);
 }
