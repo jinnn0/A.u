@@ -131,6 +131,15 @@
         z-index: 0;
         font-weight: 400;
       }
+
+      .message {
+        display: inline-block;
+        font-weight: lighter;
+        position: absolute;
+        left: 50%;
+        bottom: 100px;
+        transform: translateX(-50%);
+      }
     </style>
   </head>
   <body>
@@ -181,6 +190,8 @@
         <a href="">J</a>
       </li>
     </ul>
+
+    <p class="message">Press space bar</p>
 
     <canvas id="canvas"></canvas>
 
