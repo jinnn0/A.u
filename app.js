@@ -2,21 +2,8 @@ import * as THREE from './node_modules/three/build/three.module.js';
 
 const canvas = document.querySelector('canvas');
 
-const colors = [
-  '#4080ff',
-  '#ffe940',
-  '#40ffff',
-  '#fed1ff',
-  '#ee00f2',
-  '#f25100',
-  '#d2d1ff',
-  '#ffa929',
-  '#cfff4a',
-  '#fff200',
-  '#8efabf',
-  '#0026ff',
-  '#ff4f6f'
-];
+// prettier-ignore
+const colors = ['#4080ff','#ffe940','#40ffff','#fed1ff','#ee00f2','#f25100','#d2d1ff', '#ffa929','#cfff4a','#fff200','#8efabf','#0026ff','#ff4f6f'];
 
 let renderer, camera, scene;
 let sphere;
@@ -35,11 +22,11 @@ function init() {
   const spotLight = new THREE.SpotLight(0xffffff);
   spotLight.position.set(100, 100, 100);
   spotLight.castShadow = true; //If set to true light will cast dynamic shadows. Warning: This is expensive and requires tweaking to get shadows looking right.
-  spotLight.shadowMapWidth = 1024;
-  spotLight.shadowMapHeight = 1024;
-  spotLight.shadowCameraNear = 500;
-  spotLight.shadowCameraFar = 4000;
-  spotLight.shadowCameraFov = 30;
+  spotLight.shadow.mapSize.width = 1024;
+  spotLight.shadow.mapSize.height = 1024;
+  spotLight.shadow.camera.near = 500;
+  spotLight.shadow.camera.far = 4000;
+  spotLight.shadow.camera.fov = 30;
   scene.add(spotLight);
 
   // sphere
