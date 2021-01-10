@@ -4,6 +4,8 @@ This is the first project for getting started with Three.js.
 
 ### Things covered
 
+#### Project 1
+
 - [x] How to set install three.js
 - [x] Three things for initial set up
   - [x] Renderer
@@ -18,6 +20,16 @@ This is the first project for getting started with Three.js.
   - [x] Fix stretchy problem
   - [x] Fix low resolution
 
-## Initial view
+#### Project 2
+
+- [x] Add OrbitControls for interaction
+
+## Screenshots
+
+### Project 1
 
 ![screenshot 1](screenshots/screenshot-1.png)
+
+### Project 2
+
+![screenshot 2](screenshots/screenshot-2.png)
