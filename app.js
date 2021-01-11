@@ -1,90 +1,104 @@
 import * as THREE from 'https://unpkg.com/three/build/three.module.js';
-
-const canvas = document.querySelector('canvas');
+import  { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'https://unpkg.com/three/examples/jsm/loaders/GLTFLoader.js';
 
 // prettier-ignore
 const colors = ['#4080ff','#ffe940','#40ffff','#fed1ff','#ee00f2','#f25100','#d2d1ff', '#ffa929','#cfff4a','#fff200','#8efabf','#0026ff','#ff4f6f'];
 
-let renderer, camera, scene;
-let sphere;
-let material;
+let renderer, scene, camera, controls, model
+const width = window.innerWidth
+const height = window.innerHeight
 
-function init() {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setClearColor('white');
+init()
+animate()
+load3dModel()
 
-  scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-  camera.position.z = 5;
+function init(){
+    // Renderer
+    renderer = new THREE.WebGLRenderer({antialias: true})
+    renderer.setSize(width, height)
+    renderer.setClearColor('white')
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement)
 
-  // light
-  const spotLight = new THREE.SpotLight(0xffffff);
-  spotLight.position.set(100, 100, 100);
-  spotLight.castShadow = true; //If set to true light will cast dynamic shadows. Warning: This is expensive and requires tweaking to get shadows looking right.
-  spotLight.shadow.mapSize.width = 1024;
-  spotLight.shadow.mapSize.height = 1024;
-  spotLight.shadow.camera.near = 500;
-  spotLight.shadow.camera.far = 4000;
-  spotLight.shadow.camera.fov = 30;
-  scene.add(spotLight);
+    // Camera
+    camera = new THREE.PerspectiveCamera(75, width / height, 1, 1000)
+    camera.position.set(0, 10, 200)
 
-  // sphere
-  // material
-  material = new THREE.MeshPhongMaterial({
-    color: new THREE.Color('rgb(35,35,213)'),
-    specular: new THREE.Color('rgb(93,195,255)'),
-    shininess: 1,
-    wireframe: 1,
-    transparent: true,
-    opacity: 0.5
+    // Scene 
+    scene = new THREE.Scene()
+
+    // Controls
+    controls = new OrbitControls( camera, renderer.domElement )
+    controls.minDistance = 50
+    controls.maxDistance = 250
+
+    // Lights
+    const light1 = new THREE.AmbientLight(0x404040)
+    const light2 = new THREE.DirectionalLight( 0xffffff, 1)
+
+    light2.position.set(1,3,2)
+
+    scene.add( light1 );
+    scene.add( light2 );
+}
+
+
+function load3dModel(){
+    const loader = new GLTFLoader();
+    loader.load( 'model/scene.gltf', ( gltf ) => {
+        model = gltf.scene
+        scene.add(model)
+    
+        model.scale.set(0.1, 0.1, 0.1)
+        model.position.y = -35
+        model.rotation.x = 0.2
+        model.rotation.y = 0.5
+    })
+}
+
+
+function animate(){
+    requestAnimationFrame(animate)
+
+   if(model) {
+    model.rotation.y += 0.01 
+   }
+
+    controls.update();
+    renderer.render(scene, camera)
+}
+
+
+// Window resize
+window.addEventListener('resize', onWindowResize, false)
+
+function onWindowResize(){
+    const width = window.innerWidth
+    const height = window.innerHeight
+
+
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+    renderer.setSize(width, height)
+    controls.update()
+}
+
+
+// Spacebar event
+document.addEventListener('keyup', (event) => {
+    if (event.code === 'Space') {
+      const randomNumber = getNumber();
+
+      renderer.setClearColor(colors[randomNumber])
+    }
   });
 
-  const geometry2 = new THREE.SphereGeometry(2, 10, 10, 0, Math.PI * 2, 0, Math.PI);
-  sphere = new THREE.Mesh(geometry2, material);
-  scene.add(sphere);
-}
 
-function animate() {
-  requestAnimationFrame(animate);
-
-  sphere.rotation.x += 0.005;
-  sphere.rotation.y += 0.005;
-
-  if (resizeRendererToDisplaySize()) {
-    // 1. fix stretchy problem
-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    camera.updateProjectionMatrix();
-
-    // 2. fix low resolution problem
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-  }
-
-  renderer.render(scene, camera);
-}
-
-init();
-animate();
-
-function resizeRendererToDisplaySize() {
-  const width = canvas.clientWidth;
-  const height = canvas.clientHeight;
-  const needResize = canvas.width !== width || canvas.height !== height;
-
-  return needResize;
-}
-
-document.addEventListener('keyup', (event) => {
-  if (event.code === 'Space') {
-    const randomNumber = getNumber();
-    console.log(randomNumber, Object.entries(getNumber));
-    material.color = new THREE.Color(colors[randomNumber]);
-  }
-});
-
-/* util functions */
+// Helpers
 function getNumber() {
-  return (getNumber.number = Math.floor(Math.random() * 14)) === getNumber.lastNumber
-    ? getNumber()
-    : (getNumber.lastNumber = getNumber.number);
-}
+    return (getNumber.number = Math.floor(Math.random() * 14)) === getNumber.lastNumber
+      ? getNumber()
+      : (getNumber.lastNumber = getNumber.number);
+  }
