@@ -77,7 +77,7 @@ function resizeRendererToDisplaySize() {
 document.addEventListener('keyup', (event) => {
   if (event.code === 'Space') {
     const randomNumber = getNumber();
-    console.log(randomNumber, Object.entries(getNumber));
+    // console.log(randomNumber, Object.entries(getNumber));
     material.color = new THREE.Color(colors[randomNumber]);
   }
 });
