@@ -24,6 +24,10 @@ This is the first project for getting started with Three.js.
 
 - [x] Add OrbitControls for interaction
 
+#### Project 3
+
+- [x] Load external 3d model
+
 ## Screenshots
 
 ### Project 1
@@ -33,3 +37,7 @@ This is the first project for getting started with Three.js.
 ### Project 2
 
 ![screenshot 2](screenshots/screenshot-2.png)
+
+### Project 3
+
+![screenshot 3](screenshots/screenshot-3.png)
