@@ -1,101 +1,125 @@
-import * as THREE from './node_modules/three/build/three.module.js';
+import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls';
+import { initControls } from './controls.js';
 
-const canvas = document.querySelector('canvas');
+// prettier-ignore
+const colors = ['#4080ff','#ffe940','#40ffff', '#374cae', '#fed1ff','#ee00f2','#f25100','#374cae','#d2d1ff', '#ffa929','#cfff4a','#fff200','#8efabf','#0026ff','#ff4f6f'];
 
-const colors = [
-  '#4080ff',
-  '#ffe940',
-  '#40ffff',
-  '#fed1ff',
-  '#ee00f2',
-  '#f25100',
-  '#d2d1ff',
-  '#ffa929',
-  '#cfff4a',
-  '#fff200',
-  '#8efabf',
-  '#0026ff',
-  '#ff4f6f'
-];
+let renderer, scene, camera, controls, globe;
+const width = window.innerWidth;
+const height = window.innerHeight;
 
-let renderer, camera, scene;
-let sphere;
-let material;
+setup();
+createGlobe();
+createCloud();
+animate();
 
-function init() {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setClearColor('white');
+function setup() {
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setClearColor('#374cae');
+  renderer.setPixelRatio(window.devicePixelRatio);
+  document.body.appendChild(renderer.domElement);
 
+  // Camera
+  camera = new THREE.PerspectiveCamera(75, width / height, 1, 1000);
+  camera.position.set(0, 10, 100);
+
+  // Scene
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-  camera.position.z = 5;
+  // Controls
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableZoom = false;
 
-  // light
-  const spotLight = new THREE.SpotLight(0xffffff);
-  spotLight.position.set(100, 100, 100);
-  spotLight.castShadow = true; //If set to true light will cast dynamic shadows. Warning: This is expensive and requires tweaking to get shadows looking right.
-  spotLight.shadowMapWidth = 1024;
-  spotLight.shadowMapHeight = 1024;
-  spotLight.shadowCameraNear = 500;
-  spotLight.shadowCameraFar = 4000;
-  spotLight.shadowCameraFov = 30;
-  scene.add(spotLight);
+  // Lights
+  const light1 = new THREE.AmbientLight(0x404040);
+  const light2 = new THREE.DirectionalLight(0xffffff, 1);
 
-  // sphere
-  // material
-  material = new THREE.MeshPhongMaterial({
-    color: new THREE.Color('rgb(35,35,213)'),
-    specular: new THREE.Color('rgb(93,195,255)'),
-    shininess: 1,
-    wireframe: 1,
+  light2.position.set(1, 3, 2);
+
+  scene.add(light1);
+  scene.add(light2);
+}
+
+function createGlobe() {
+  // create texture
+  const textureLoader = new THREE.TextureLoader();
+  // Add basic texture
+  const texture = textureLoader.load('./images/earthMap-2.jpg');
+  // Add some 'depth' to the texture
+  const bumpMap = textureLoader.load('./images/earthBump.jpg');
+  // Add shininess to the globe, allowing reflectivity off of the lights
+  const specularMap = textureLoader.load('./images/earthSpec.jpg');
+
+  const earthMaterialSetting = {
+    map: texture,
+    bumpMap: bumpMap,
+    bumpScale: 2,
+    specularMap: specularMap
+  };
+
+  // create mesh with sphere geometry and material with custom setting above
+  const earthGeometry = new THREE.SphereGeometry(50, 50, 50);
+  const earthMaterial = new THREE.MeshPhongMaterial(earthMaterialSetting);
+
+  globe = new THREE.Mesh(earthGeometry, earthMaterial);
+  globe.rotation.x = 0.5;
+  globe.rotation.y = -1.5;
+
+  scene.add(globe);
+}
+
+function createCloud() {
+  const textureLoader = new THREE.TextureLoader();
+  const cloudTexture = textureLoader.load('./images/earthCloud.jpg');
+  const cloudMaterialSetting = {
+    color: 0xffffff,
+    map: cloudTexture,
     transparent: true,
-    opacity: 0.5
-  });
+    opacity: 0.15
+  };
 
-  const geometry2 = new THREE.SphereGeometry(2, 10, 10, 0, Math.PI * 2, 0, Math.PI);
-  sphere = new THREE.Mesh(geometry2, material);
-  scene.add(sphere);
+  const cloudGeometry = new THREE.SphereGeometry(50, 50, 50);
+  const cloudMaterial = new THREE.MeshLambertMaterial(cloudMaterialSetting);
+  const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+
+  cloud.scale.set(1.01, 1.01, 1.01);
+  scene.add(cloud);
 }
 
 function animate() {
   requestAnimationFrame(animate);
 
-  sphere.rotation.x += 0.005;
-  sphere.rotation.y += 0.005;
-
-  if (resizeRendererToDisplaySize()) {
-    // 1. fix stretchy problem
-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    camera.updateProjectionMatrix();
-
-    // 2. fix low resolution problem
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-  }
-
+  controls.update();
+  initControls(camera);
   renderer.render(scene, camera);
 }
 
-init();
-animate();
-
-function resizeRendererToDisplaySize() {
-  const width = canvas.clientWidth;
-  const height = canvas.clientHeight;
-  const needResize = canvas.width !== width || canvas.height !== height;
-
-  return needResize;
-}
-
+// Spacebar event
 document.addEventListener('keyup', (event) => {
   if (event.code === 'Space') {
     const randomNumber = getNumber();
-    console.log(randomNumber, Object.entries(getNumber));
-    material.color = new THREE.Color(colors[randomNumber]);
+
+    renderer.setClearColor(colors[randomNumber]);
   }
 });
 
-/* util functions */
+// Window resize
+window.addEventListener('resize', onWindowResize, false);
+
+function onWindowResize() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+  controls.update();
+}
+
+// Helpers
 function getNumber() {
   return (getNumber.number = Math.floor(Math.random() * 14)) === getNumber.lastNumber
     ? getNumber()
