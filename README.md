@@ -28,6 +28,12 @@ This is the first project for getting started with Three.js.
 
 - [x] Load external 3d model
 
+#### Project 4
+
+Creating a globe
+
+- [x] Texture mapping
+
 ## Screenshots
 
 ### Project 1
@@ -41,3 +47,7 @@ This is the first project for getting started with Three.js.
 ### Project 3
 
 ![screenshot 3](screenshots/screenshot-3.png)
+
+### Project 4
+
+![screenshot 4](screenshots/screenshot-4.png)
