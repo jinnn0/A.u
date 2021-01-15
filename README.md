@@ -31,6 +31,8 @@ This is a collection of projects for getting started with Three.js.
 #### Project 4 - Creating a globe
 
 - [x] Texture mapping
+- [x] Grouping objects (new THREE.Group())
+- [x] Converting spherical coordinates to cartesian coordinates
 
 ## Screenshots
 
@@ -48,4 +50,5 @@ This is a collection of projects for getting started with Three.js.
 
 ### Project 4
 
-![screenshot 4](screenshots/screenshot-4.png)
+![screenshot 4.1](screenshots/screenshot-4.1.png)
+![screenshot 4.2](screenshots/screenshot-4.2.png)
