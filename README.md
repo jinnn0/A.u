@@ -1,6 +1,6 @@
 # A.u
 
-This is the first project for getting started with Three.js.
+This is a collection of projects for getting started with Three.js.
 
 ### Things covered
 
@@ -28,9 +28,7 @@ This is the first project for getting started with Three.js.
 
 - [x] Load external 3d model
 
-#### Project 4
-
-Creating a globe
+#### Project 4 - Creating a globe
 
 - [x] Texture mapping
 
