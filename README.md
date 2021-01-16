@@ -28,12 +28,15 @@ This is a collection of projects for getting started with Three.js.
 
 - [x] Load external 3d model
 
+<<<<<<< HEAD
 #### Project 4 - Creating a globe
 
 - [x] Texture mapping
 - [x] Grouping objects (new THREE.Group())
 - [x] Converting spherical coordinates to cartesian coordinates
 
+=======
+>>>>>>> project3
 ## Screenshots
 
 ### Project 1
@@ -47,8 +50,11 @@ This is a collection of projects for getting started with Three.js.
 ### Project 3
 
 ![screenshot 3](screenshots/screenshot-3.png)
+<<<<<<< HEAD
 
 ### Project 4
 
 ![screenshot 4.1](screenshots/screenshot-4.1.png)
 ![screenshot 4.2](screenshots/screenshot-4.2.png)
+=======
+>>>>>>> project3
