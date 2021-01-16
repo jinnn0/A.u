@@ -1,90 +1,119 @@
 import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls';
 
-const canvas = document.querySelector('canvas');
+let renderer, camera, controls, scene;
+let boxes = [];
+let width = window.innerWidth;
+let height = window.innerHeight;
 
 // prettier-ignore
 const colors = ['#4080ff','#ffe940','#40ffff','#fed1ff','#ee00f2','#f25100','#d2d1ff', '#ffa929','#cfff4a','#fff200','#8efabf','#0026ff','#ff4f6f'];
 
-let renderer, camera, scene;
-let sphere;
-let material;
+init();
+addObjects();
+animate();
 
 function init() {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setClearColor('white');
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  document.body.appendChild(renderer.domElement);
+  renderer.setClearColor(0xc3cfe3);
+  renderer.setSize(width, height);
 
+  // Camera
+  camera = new THREE.PerspectiveCamera(75, width / height, 0.01, 2000);
+  camera.position.set(80, 65, 150);
+
+  // Scene
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-  camera.position.z = 5;
+  // Controls
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.minDistance = 100;
+  controls.maxDistance = 300;
 
-  // light
-  const spotLight = new THREE.SpotLight(0xffffff);
-  spotLight.position.set(100, 100, 100);
-  spotLight.castShadow = true; //If set to true light will cast dynamic shadows. Warning: This is expensive and requires tweaking to get shadows looking right.
-  spotLight.shadow.mapSize.width = 1024;
-  spotLight.shadow.mapSize.height = 1024;
-  spotLight.shadow.camera.near = 500;
-  spotLight.shadow.camera.far = 4000;
-  spotLight.shadow.camera.fov = 30;
-  scene.add(spotLight);
+  // How far you can orbit vertically, upper and lower limits.
+  controls.minPolarAngle = Math.PI / 4;
+  controls.maxPolarAngle = Math.PI / 2.5;
 
-  // sphere
-  // material
-  material = new THREE.MeshPhongMaterial({
-    color: new THREE.Color('rgb(35,35,213)'),
-    specular: new THREE.Color('rgb(93,195,255)'),
-    shininess: 1,
-    wireframe: 1,
-    transparent: true,
-    opacity: 0.5
-  });
+  // How far you can orbit horizontally, upper and lower limits.
+  controls.minAzimuthAngle = -degreesToRadians(10);
+  controls.maxAzimuthAngle = degreesToRadians(90);
 
-  const geometry2 = new THREE.SphereGeometry(2, 10, 10, 0, Math.PI * 2, 0, Math.PI);
-  sphere = new THREE.Mesh(geometry2, material);
-  scene.add(sphere);
+  // Lights
+  const light1 = new THREE.AmbientLight(0x404040);
+  const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+
+  light2.position.set(1, 3, 1);
+
+  scene.add(light1);
+  scene.add(light2);
 }
 
 function animate() {
   requestAnimationFrame(animate);
-
-  sphere.rotation.x += 0.005;
-  sphere.rotation.y += 0.005;
-
-  if (resizeRendererToDisplaySize()) {
-    // 1. fix stretchy problem
-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    camera.updateProjectionMatrix();
-
-    // 2. fix low resolution problem
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-  }
-
   renderer.render(scene, camera);
 }
 
-init();
-animate();
+function addObjects() {
+  const numberOfBox = 30;
+  const distance = 10;
 
-function resizeRendererToDisplaySize() {
-  const width = canvas.clientWidth;
-  const height = canvas.clientHeight;
-  const needResize = canvas.width !== width || canvas.height !== height;
+  for (let i = 0; i < numberOfBox; i++) {
+    for (let j = 0; j < numberOfBox; j++) {
+      const width = randomNumber(5, 15);
+      const height = randomNumber(25, 80);
+      const depth = randomNumber(5, 15);
 
-  return needResize;
+      const geometry = new THREE.BoxGeometry(width, height, depth);
+      const material = new THREE.MeshPhongMaterial({ color: new THREE.Color(0x2194ce) });
+
+      const box = new THREE.Mesh(geometry, material);
+      box.position.x = distance * i;
+      box.position.z = distance * j;
+
+      scene.add(box);
+      boxes.push(box);
+    }
+  }
 }
 
+// Window resize
+window.addEventListener('resize', onWindowResize, false);
+
+function onWindowResize() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+  controls.update();
+}
+
+// Spacebar event
 document.addEventListener('keyup', (event) => {
   if (event.code === 'Space') {
     const randomNumber = getNumber();
-    // console.log(randomNumber, Object.entries(getNumber));
-    material.color = new THREE.Color(colors[randomNumber]);
+
+    boxes.forEach((box) => {
+      box.material.color = new THREE.Color(colors[randomNumber]);
+    });
   }
 });
 
-/* util functions */
+// Helpers
+function randomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 function getNumber() {
   return (getNumber.number = Math.floor(Math.random() * 14)) === getNumber.lastNumber
     ? getNumber()
     : (getNumber.lastNumber = getNumber.number);
+}
+
+function degreesToRadians(degrees) {
+  const pi = Math.PI;
+  return degrees * (pi / 180);
 }
