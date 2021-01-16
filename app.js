@@ -22,6 +22,7 @@ const coordinates = [
 ];
 
 let renderer, scene, camera, controls;
+let textures = {};
 let radius = 1;
 let globe;
 let earth;
@@ -35,8 +36,15 @@ setup();
 addGlobe();
 createPin();
 coordinates.forEach((place) => addPin(place[0], place[1]));
+
+const geometry = new THREE.BoxBufferGeometry(1, 0.2, 1, 32, 8, 32);
+const material = new THREE.MeshPhongMaterial();
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
 animate();
 
+// Setup
 function setup() {
   // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -50,7 +58,7 @@ function setup() {
 
   // Camera
   camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-  camera.position.set(0, 0, 2);
+  camera.position.set(0, 0, 2.5);
 
   // Controls
   controls = new OrbitControls(camera, renderer.domElement);
@@ -63,42 +71,45 @@ function setup() {
 
   scene.add(light1);
   scene.add(light2);
+
+  // Loading
+  const manager = new THREE.LoadingManager();
+  manager.onLoad = () => {
+    setTimeout(() => (renderer.domElement.style.opacity = '1'));
+  };
+
+  // texture
+  const textureLoader = new THREE.TextureLoader(manager);
+
+  textures.earthMap = textureLoader.load('./images/earthMap.jpg');
+  textures.earthBump = textureLoader.load('./images/earthBump.jpg');
+  textures.earthSpec = textureLoader.load('./images/earthSpec.jpg');
+  textures.cloudMap = textureLoader.load('./images/earthCloud.jpg');
 }
 
+// Add globe to the scene
 function addGlobe() {
   globe = new THREE.Group();
 
-  const textureLoader = new THREE.TextureLoader();
-
-  // 1.  Creating globe
-  // 1.1 Texture setup
-  const earthMap = textureLoader.load('./images/earthMap.jpg');
-  const earthBump = textureLoader.load('./images/earthBump.jpg');
-  const earthSpec = textureLoader.load('./images/earthSpec.jpg');
-
+  // Earth
   const earthTexture = {
-    map: earthMap,
-    bumpMap: earthBump,
+    map: textures.earthMap,
+    bumpMap: textures.earthBump,
     bumpScale: 0.05,
-    specularMap: earthSpec
+    specularMap: textures.earthSpec
   };
 
-  // 1.2 Creating earth mesh
   const earthGeoMetry = new THREE.SphereGeometry(radius, 60, 60);
   const earthMaterial = new THREE.MeshPhongMaterial(earthTexture);
   earth = new THREE.Mesh(earthGeoMetry, earthMaterial);
 
-  // 2.  Creating cloud
-  // 2.1 Texture setup
-  const cloudMap = textureLoader.load('./images/earthCloud.jpg');
-
+  // Cloud
   const cloudTexture = {
-    map: cloudMap,
+    map: textures.cloudMap,
     transparent: true,
     opacity: 0.15
   };
 
-  // 2.2 Creating cloud mesh
   const cloudGeometry = new THREE.SphereGeometry(radius, 60, 60);
   const cloudMaterial = new THREE.MeshPhongMaterial(cloudTexture);
   cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
@@ -117,6 +128,7 @@ function addGlobe() {
   scene.add(globe);
 }
 
+// Create pin object
 function createPin() {
   pin = new THREE.Group();
 
@@ -140,6 +152,7 @@ function createPin() {
   return pin;
 }
 
+// Add pin onto the globe
 function addPin(lat, lon) {
   const pin = createPin();
 
