@@ -1,5 +1,5 @@
-import * as THREE from 'https://unpkg.com/three/build/three.module.js';
-import { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls';
+import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 
 // prettier-ignore
 const colors = ['#4080ff','#ffe940','#40ffff', '#374cae', '#fed1ff','#ee00f2','#f25100','#374cae','#d2d1ff', '#ffa929','#cfff4a','#fff200','#8efabf','#0026ff','#ff4f6f'];
